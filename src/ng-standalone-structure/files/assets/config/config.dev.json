@@ -1,0 +1,11 @@
+{
+  "env": {
+    "name": "dev"
+  },
+  "apiServer": {
+    "useAbsoluteDomainUrl": true,
+    "url": "http://localhost",
+    "port": "5108",
+    "suffix":""
+  }
+}

@@ -1,0 +1,54 @@
+html, body {
+    margin: 0px;
+    min-height: 100%;
+    height: 100%;
+    font-size: 62.5%;
+
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  .content {
+    line-height: 1.5;
+    flex-grow: 1;
+  
+    h2 {
+      font-size: 3rem;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+    }
+  }
+  
+  .container {
+    height: 100%;
+    flex-direction: column;
+    display: flex;
+  }
+  
+  .layout-body {
+    flex: 1;
+    min-height: 0;
+  }
+    
+  .content-block {
+    margin-left: 4rem;
+    margin-right: 4rem;
+    margin-top: 2rem;
+  
+    .screen-x-small & {
+      margin-left: 2rem;
+      margin-right: 2rem;
+    }
+  }
+  
+  .responsive-paddings {
+    padding: 2rem;
+  
+    .screen-large & {
+      padding: 4rem;
+    }
+  }
+  
+  

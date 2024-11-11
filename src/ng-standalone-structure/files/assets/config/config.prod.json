@@ -1,0 +1,11 @@
+{
+  "env": {
+    "name": "prod"
+  },
+  "apiServer": {
+    "useAbsoluteDomainUrl": true,
+    "url": "http://192.168.3.13",
+    "port": "4400",
+    "suffix":""
+  }
+}

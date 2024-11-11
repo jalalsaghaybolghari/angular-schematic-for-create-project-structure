@@ -1,0 +1,14 @@
+{
+  "$schema": "../node_modules/@angular-devkit/schematics/collection-schema.json",
+  "schematics": {
+    "custom-angular-structure": {
+      "description": "A blank schematic.",
+      "factory": "./custom-angular-structure/index#customAngularStructure"
+    },
+    "ng-standalone-structure": {
+      "description": "Generate custom Angular folder structure",
+      "factory": "./ng-standalone-structure/index#setupStructure",
+      "schema": "./ng-standalone-structure/schema.json"
+    }
+  }
+}
