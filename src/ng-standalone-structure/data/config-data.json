@@ -1,0 +1,14 @@
+{
+  "updateAppConfigByConfigService": {
+    "path": "src/app/app.config.ts",
+    "providersMetaData": [
+      "provideHttpClient()",
+      "{ provide: APP_INITIALIZER, useFactory: () => { const appConfigService = inject(AppConfigService); return () => appConfigService.loadConfig(); }, deps: [AppConfigService], multi: true }"
+    ],
+     "importStatements": [
+      "import { APP_INITIALIZER, inject } from '@angular/core';",
+      "import { AppConfigService } from './shared/services';",
+      "import { provideHttpClient } from '@angular/common/http';"
+    ]
+  }
+}

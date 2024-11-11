@@ -1,96 +1,145 @@
-import {
-  Rule,
-  SchematicContext,
-  Tree,
-  apply,
-  url,
-  template,
-  move,
-  mergeWith,
-  chain,
-} from "@angular-devkit/schematics";
-import { strings } from "@angular-devkit/core";
-import * as ts from "typescript";
+// import {
+//   Rule,
+//   SchematicContext,
+//   Tree,
+//   apply,
+//   url,
+//   template,
+//   move,
+//   mergeWith,
+//   chain,
+//   UpdateRecorder,
+// } from "@angular-devkit/schematics";
+// import { strings } from "@angular-devkit/core";
+// import * as ts from "typescript";
 
-function createFolderStructure(_options: any): Rule {
-  const templateSource = apply(url("./files"), [
-    template({
-      ..._options,
-      ...strings,
-    }),
-    move("/src"),
-  ]);
+// function createFolderStructure(_options: any): Rule {
+//   const templateSource = apply(url("./files"), [
+//     template({
+//       ..._options,
+//       ...strings,
+//     }),
+//     move("/src"),
+//   ]);
 
-  return mergeWith(templateSource);
-}
+//   return mergeWith(templateSource);
+// }
 
-function addImportToModuleFile(tree: Tree, path: string) {
-  const importText = `
-  import { APP_INITIALIZER, inject} from '@angular/core';
-  import { AppConfigService } from './shared/services';
-  import { provideHttpClient } from '@angular/common/http';
-`;
-  const moduleArrayEntry = `provideHttpClient(),
-   {    
-      provide: APP_INITIALIZER,
-      useFactory: () => {
-        const appConfigService = inject(AppConfigService);
-        return () => appConfigService.loadConfig();
-      },
-      deps: [AppConfigService],
-      multi: true
-    },`;
+// function getFileRecorder(tree: Tree, path: string): UpdateRecorder {
+//   if (!tree.exists(path)) {
+//     throw new Error(`File ${path} not found`);
+//   }
 
-  if (!tree.exists(path)) {
-    throw new Error(`File ${path} not found`);
-  }
+//   const fileContent = tree.read(path);
+//   if (!fileContent) {
+//     throw new Error(`Could not read ${path}`);
+//   }
+//   return tree.beginUpdate(path);
+// }
 
-  const fileContent = tree.read(path);
-  if (!fileContent) {
-    throw new Error(`Could not read ${path}`);
-  }
+// function commitFileRecorder(tree: Tree, recorder: UpdateRecorder): void {
+//   tree.commitUpdate(recorder);
+// }
 
-  const sourceFile = ts.createSourceFile(
-    path,
-    fileContent.toString(),
-    ts.ScriptTarget.Latest,
-    true
-  );
+// function addStatementsToMetaData(
+//   path: string,
+//   tree: Tree,
+//   recorder: UpdateRecorder,
+//   moduleArrayEntry: string,
+//   metaData: string
+// ) {
+//   const fileContent = tree.read(path) as Buffer;
 
-  if (!sourceFile.getText().includes(importText)) {
-    const recorder = tree.beginUpdate(path);
+//   const sourceFile = ts.createSourceFile(
+//     path,
+//     fileContent.toString(),
+//     ts.ScriptTarget.Latest,
+//     true
+//   );
+//   const moduleArrayMatch = sourceFile
+//     .getText()
+//     .match(new RegExp(`${metaData}:\\s*\\[([\\s\\S]*?)\\]`));
 
-    // Add import statement at the top
-    recorder.insertLeft(0, `${importText}\n`);
+//   if (moduleArrayMatch) {
+//     const importsPosition =
+//       moduleArrayMatch.index! + moduleArrayMatch[0].length - 1;
+//     recorder.insertLeft(importsPosition, `, ${moduleArrayEntry}`);
+//   }
+// }
 
-    // Locate the providers array and add the new module
-    const providersArrayMatch = sourceFile
-      .getText()
-      .match(/providers:\s*\[([\s\S]*?)\]/);
+// function addStatementsToTopOfFile(recorder: UpdateRecorder, statement: string) {
+//   recorder.insertLeft(0, `${statement}\n`);
+// }
 
-    if (providersArrayMatch) {
-      const importsPosition =
-      providersArrayMatch.index! + providersArrayMatch[0].length - 1;
-      recorder.insertLeft(importsPosition, `, ${moduleArrayEntry}`);
-    }
+// export function setupStructure(_options: any): Rule {
+//   return (tree: Tree, _context: SchematicContext) => {
+//     // Create folder structure
+//     const folderStructureRule = createFolderStructure(_options);
 
-    tree.commitUpdate(recorder);
-  }
-}
+//     // ---------------------------------------------------------
+//     const path = "src/app/app.config.ts";
+//     const recorder = getFileRecorder(tree, path);
 
-function editAppConfigFile(tree:Tree){
-  const modulePath = "src/app/app.config.ts";
-  addImportToModuleFile(tree, modulePath);
+//     const importText = `
+//       import { APP_INITIALIZER, inject} from '@angular/core';
+//       import { AppConfigService } from './shared/services';
+//       import { provideHttpClient } from '@angular/common/http';
+//     `;
+//     addStatementsToTopOfFile(recorder, importText);
+
+//     const metaDataEntry = `
+//     provideHttpClient(),
+//     {    
+//        provide: APP_INITIALIZER,
+//        useFactory: () => {
+//          const appConfigService = inject(AppConfigService);
+//          return () => appConfigService.loadConfig();
+//        },
+//        deps: [AppConfigService],
+//        multi: true
+//     },
+//     `;
+//     const metaDataName = "providers";
+//     addStatementsToMetaData(
+//       path,
+//       tree,
+//       recorder,
+//       metaDataEntry,
+//       metaDataName
+//     );
+//     commitFileRecorder(tree, recorder);
+//     //----------------------------------------------------------
+
+//     // Chain the folder structure creation rule
+//     return chain([folderStructureRule]);
+//   };
+// }
+
+
+
+import { Rule, SchematicContext, Tree, chain } from "@angular-devkit/schematics";
+import { createFolderStructure } from "./file-utils";
+import { addImports, addMetadataEntry } from "./metadata-utils";
+import * as path from "path";
+import * as fs from "fs";
+
+const CONFIG_PATH = path.join(__dirname, './data/config-data.json');
+
+function loadConfigData(): ConfigData {
+  const configFile = fs.readFileSync(CONFIG_PATH, 'utf-8');
+  return JSON.parse(configFile);
 }
 
 export function setupStructure(_options: any): Rule {
   return (tree: Tree, _context: SchematicContext) => {
-    // Create folder structure
-    const folderStructureRule = createFolderStructure(_options);
-    
-    editAppConfigFile(tree)
+    const configData = loadConfigData();
+    const appConfigData = configData.updateAppConfigByConfigService;
 
-    // Chain the folder structure creation rule
+    const folderStructureRule = createFolderStructure(_options);
+
+    addImports(tree, appConfigData.path, appConfigData.importStatements.join('\n'));
+    addMetadataEntry(tree, appConfigData.path, "providers", appConfigData.providersMetaData.join(',\n'));
+
     return chain([folderStructureRule]);
   };
 }
