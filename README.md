@@ -43,16 +43,15 @@ The primary goal of this project is to create a boilerplate structure for new An
 1. **Generate a New Angular Project**  
    Use the schematics command to create a new Angular project:
    ```bash
-   ng generate <schematics-name>:new-project <project-name>
+   ng new <project-name>
    ```
    Replace `<project-name>` with your desired project name.
 
 2. **Add Optional Modules or Libraries**  
    You can specify optional modules or libraries to include in your project:
    ```bash
-   ng generate <schematics-name>:add-module <module-name>
+   schematics custom-angular-structure:ng-standalone-structure
    ```
-   Replace `<module-name>` with the module you want to add (e.g., `routing`, `forms`, `http`, etc.).
 
 3. **Running the Project**  
    After generating the boilerplate, navigate into the newly created project folder and run:
@@ -60,21 +59,6 @@ The primary goal of this project is to create a boilerplate structure for new An
    cd <project-name>
    ng serve
    ```
-
-### Examples
-
-- **Create a Basic Angular Project**  
-  ```bash
-  ng generate <schematics-name>:new-project myApp
-  ```
-- **Add Routing Module to the Project**  
-  ```bash
-  ng generate <schematics-name>:add-module routing
-  ```
-- **Add HttpClientModule to the Project**  
-  ```bash
-  ng generate <schematics-name>:add-module http
-  ```
 
 ## Available Modules & Libraries
 
@@ -93,7 +77,6 @@ src/
 │   ├── core/            # Core services and modules
 │   ├── shared/          # Shared modules, components, and services
 │   ├── features/        # Feature-specific modules and components
-│   ├── app.module.ts    # Main application module
 │   └── ...
 ├── assets/              # Static assets (images, fonts, etc.)
 ├── environments/        # Environment configuration files
